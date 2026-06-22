@@ -1,281 +1,152 @@
-[G2 Reviews Scraper](https://apify.com/zhorex/g2-reviews-scraper?fpr=data)
+[G2 Reviews Scraper](https://apify.com/kawsar/g2-reviews-scraper?fpr=data)
 
-While other G2 scrapers fight Cloudflare + DataDome and fail (average store rating: 1.4 stars), this actor uses an alternative data path that doesn't require browser rendering. No browser, no proxy, no blocking.
+# G2 Reviews Scraper
 
-## How to scrape G2 reviews in 3 easy steps
+![G2 Reviews Scraper](https://images.apifyusercontent.com/zdiMPtEkvvBvv83dMGldqT9usZ_UxCAsTGOEiXWWL7U/w:1800/cb:1/aHR0cHM6Ly9pLmltZ3VyLmNvbS9pdG5kb3JXLnBuZw.webp)
 
-1. **Go to [G2 Reviews Scraper](https://apify.com/zhorex/g2-reviews-scraper)** on Apify Store and click **"Try for free"**
-2. **Enter G2 product URLs** or search by keyword — paste URLs like `https://www.g2.com/products/slack/reviews` or just type the product name
-3. **Click Run** and download your results in JSON, CSV, or Excel
+Scrape full customer reviews from any G2 product page. You get reviewer names, job titles, company sizes, star ratings, full pros and cons text, vendor responses, and trust badges. Works with filtered URLs and pages automatically to go well beyond what the G2 interface shows.
 
-No coding required. No proxy setup. Works with Apify's free plan. Start extracting G2 reviews in under 60 seconds.
+## What this actor does
 
-## Key Features
+G2 is a software review platform where verified buyers leave detailed feedback about products they actually use. This actor pulls that data out so you can work with it.
 
-- **No proxy needed** — direct data access, no IP restrictions to fight
-- **No browser needed** — pure HTTP requests, runs on 256MB RAM
-- **41 fields per review** — including NPS, sentiment themes, switching data, regional info
-- **3 modes** — extract reviews, search products, or browse categories
-- **Batch processing** — scrape multiple products in a single run
-- **Cursor-based pagination** — handles products with 50,000+ reviews (no offset limit)
-- **Pay per result** — only pay for data you actually get
+Paste a G2 product reviews URL and it returns structured records. Each record covers everything on the page: who left the review, what they liked and disliked, how they rated the product, whether their account was validated, and whether the submission was organic or came from an incentivized invite.
 
-## Why This Works When Others Don't
+It pages automatically. G2 shows 10 reviews per page; the actor keeps going until it hits your limit or runs out of reviews. The default is 10 (first page), and you can go up to 5,000,000.
 
-G2.com uses **Cloudflare + DataDome** on their frontend, which blocks virtually all browser-based scrapers. This actor uses a different approach that doesn't require browser rendering or JavaScript execution — no anti-bot stack to fight in the first place.
+## Why this data is useful
 
-## G2 API Alternative — No Anti-Bot, No Blocking
+G2 reviews are written by people with opinions, not by marketing teams. A single detailed review often tells you more about a competitor's real weaknesses than any analyst report.
 
-Looking for a G2 API? G2 doesn't offer a public API for extracting reviews. This Actor is the best G2 API alternative in 2026 — it returns clean, structured review data without fighting Cloudflare + DataDome or browser-based scraping.
+Some practical uses:
 
-Unlike G2's official data export (limited to paying G2 customers), this Actor lets anyone extract G2 reviews at scale for competitive intelligence, market research, and product analysis.
+- Schedule the actor weekly on a competitor's page sorted by `most_recent`. When a new wave of complaints appears, you know about it before your next sales call.
+- Pull reviews from people who mention a specific pain point your product addresses. That reviewer's job title, company size, and G2 profile is right there in the output.
+- Run it on your own product to feed structured feedback into your roadmap. The `likedBest`, `dislikedMost`, and `problemsSolved` fields are already separated out.
+- Scrape several competitors at once and aggregate the ratings into a single spreadsheet for comparison.
+- Feed review data into an LLM to generate weekly competitor intelligence summaries automatically.
+- Filter by `isIncentivized` to separate organic opinions from review campaigns, useful when evaluating the credibility of a product's rating.
+- Use `reviewerJobTitle` and `reviewerCompanySize` to segment feedback by role or company size, so you know whether complaints are coming from enterprise buyers or small teams.
+- Track a product's average rating over time by storing scraped data in a database and running the actor on a schedule.
 
-## Scrape G2 reviews with Python, JavaScript, or no code
+## What you can do with G2 review data
 
-Use this Actor directly from the Apify platform (no coding required), or call it programmatically via the [Apify API](https://docs.apify.com/api) from Python, JavaScript, or any language:
+**Competitive intelligence.** Software buyers often describe exactly what they switched from, what they miss, and what they wish were different. That language is useful. If 40 reviewers of a competitor all say the same thing about a missing feature, that's a pattern worth knowing.
 
-**Python example:**
+**Sales and prospecting.** Reviewers are named, with job titles and company sizes. Someone who wrote a negative review of a direct competitor is a warm lead. They've already told you what they don't like about the alternative.
+
+**Product research.** Your own G2 reviews are structured feedback you don't need to manually read through one by one. Scrape them into a spreadsheet, run a sentiment pass, and you have a prioritized list of what's working and what isn't.
+
+**Reputation monitoring.** Set up a daily or weekly schedule and connect the dataset to a Slack webhook or Google Sheet. You'll see new reviews in near real time without having to check the G2 page manually.
+
+**Market research.** Scrape reviews across an entire software category to understand what buyers in that market care about, what language they use, and what they're willing to pay for.
+
+## Sample output
+
+![Sample output 1](https://images.apifyusercontent.com/wQTt7ZtY9JPIfco5UjRdFTsDMw9n7TVBFLM4WS9eaNM/w:1800/cb:1/aHR0cHM6Ly9pLmltZ3VyLmNvbS9XWVdXN044LnBuZw.webp)
+
+![Sample output 2](https://images.apifyusercontent.com/7ZYlkY5Qa5BwtYrzRli0GXVz_blp8Zeuevy3XLLdpRA/w:1800/cb:1/aHR0cHM6Ly9pLmltZ3VyLmNvbS9rWHN2OTZtLnBuZw.webp)
+
+## Input
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| startUrl | string | required | Full G2 product reviews URL |
+| maxItems | integer | 10 | Max reviews to collect (up to 5,000,000) |
+| requestTimeoutSecs | integer | 300 | Per-request timeout in seconds |
+
+### URL formats
+
+Plain reviews URL:
 
 ```
-from apify_client import ApifyClient
-client = ApifyClient("YOUR_API_TOKEN")
-run = client.actor("zhorex/g2-reviews-scraper").call(run_input={
-    "mode": "reviews",
-    "productUrls": ["https://www.g2.com/products/slack/reviews"],
-    "maxReviews": 100
-})
-for item in client.dataset(run["defaultDatasetId"]).iterate_items():
-    print(item)
+https://www.g2.com/products/apify/reviews
 ```
 
-**JavaScript example:**
+Filtered URL (the actor preserves your filters and sort order):
 
 ```
-import { ApifyClient } from 'apify-client';
-const client = new ApifyClient({ token: 'YOUR_API_TOKEN' });
-const run = await client.actor('zhorex/g2-reviews-scraper').call({
-    mode: 'reviews',
-    productUrls: ['https://www.g2.com/products/slack/reviews'],
-    maxReviews: 100,
-});
-const { items } = await client.dataset(run.defaultDatasetId).listItems();
-console.log(items);
+https://www.g2.com/products/chatgpt/reviews?filters%5Bcomment_answer_values%5D=&order=most_recent&utf8=%E2%9C%93#reviews
 ```
 
-## Pricing
+Deep pagination URL:
 
-| Event | Price |
+```
+https://www.g2.com/products/run-powered-by-adp/reviews_and_filters?page=50#reviews
+```
+
+### A note on pagination
+
+G2's page navigation caps out at around 10 pages in the UI. The data goes much further. This actor uses the `reviews_and_filters` endpoint with a `page` parameter to reach any page in the history. A product with 5,000 reviews is fully accessible; just raise `maxItems` and let it run.
+
+## Output fields
+
+| Field | Description |
 | --- | --- |
-| Per review extracted | $0.005 |
-| Per product found | $0.01 |
+| reviewId | G2 internal review ID |
+| reviewerId | G2 internal reviewer ID |
+| reviewUrl | Direct permalink to the review on G2 |
+| productName | Product name |
+| productId | G2 product ID |
+| reviewerName | Reviewer name (first name + last initial) |
+| reviewerJobTitle | Job title as listed on G2 |
+| reviewerCompanySize | Company size (e.g. "Small-Business (50 or fewer emp.)") |
+| rating | Star rating out of 5 |
+| reviewTitle | Review headline |
+| publishedDate | Date published (YYYY-MM-DD) |
+| likedBest | Full text of "What do you like best?" |
+| dislikedMost | Full text of "What do you dislike?" |
+| problemsSolved | Full text of "What problems is X solving?" |
+| badges | Array of trust badges on the review |
+| isValidatedReviewer | Reviewer was validated via business email |
+| isCurrentUser | Reviewer verified as a current user |
+| isIncentivized | Review was incentivized |
+| reviewSource | Source label ("Organic", "G2 invite", etc.) |
+| videoReview | Review includes video |
+| vendorResponse | Full vendor response text, if any |
+| sourceUrl | The input URL you provided |
+| scrapedAt | ISO 8601 scrape timestamp |
 
-**Up to 50% cheaper than alternatives** — and with a near-100% success rate.
-
-## Comparison
-
-| Feature | This Actor | Browser-Based Scrapers |
-| --- | --- | --- |
-| Proxy needed | **No** | Yes (residential) |
-| Browser needed | **No** | Yes (Playwright/Puppeteer) |
-| RAM required | **256 MB** | 2-4 GB |
-| Price per review | **$0.005** | $0.0065-0.01 |
-| Success rate | **~99%** | ~30-50% |
-| Anti-bot blocked | **No** | Yes (Cloudflare + DataDome) |
-| Max reviews/product | **50,000** | ~100-500 |
-
-## Input Examples
-
-### Mode: Reviews (default)
-
-Extract reviews from specific G2 products:
-
-```
-{
-    "mode": "reviews",
-    "productUrls": [
-        "https://www.g2.com/products/clickup/reviews",
-        "https://www.g2.com/products/slack",
-        "notion"
-    ],
-    "maxReviews": 500,
-    "minRating": 3,
-    "language": "en"
-}
-```
-
-### Mode: Product Search
-
-Search for products by keyword:
+### Example output
 
 ```
 {
-    "mode": "product_search",
-    "searchQuery": "project management",
-    "maxProducts": 50
+  "reviewId": "12611447",
+  "reviewerId": "7156957",
+  "reviewUrl": "https://www.g2.com/products/capsule-crm/reviews/capsule-crm-review-12611447",
+  "productName": "Capsule CRM",
+  "productId": "1585",
+  "reviewerName": "Yllza H.",
+  "reviewerJobTitle": "Admissions Coordinator",
+  "reviewerCompanySize": "Small-Business (50 or fewer emp.)",
+  "rating": 5.0,
+  "reviewTitle": "Highly Customizable Pipelines and Tasks That Fit Our Needs",
+  "publishedDate": "2026-04-10",
+  "likedBest": "What I like best about Capsule CRM is its flexibility and ease of use. The ability to customize pipelines and tasks allows us to align the system with our specific workflows...",
+  "dislikedMost": "I don't like that we can't separate milestones or tracks by pipeline...",
+  "problemsSolved": "It helps us stay in regular contact with our customers and keep our workflow organized...",
+  "badges": ["Current User", "Validated Reviewer", "Source: Organic"],
+  "isValidatedReviewer": true,
+  "isCurrentUser": true,
+  "isIncentivized": false,
+  "reviewSource": "Organic",
+  "videoReview": false,
+  "vendorResponse": "Thank you for your review! We're so pleased you're finding Capsule easy to use...",
+  "sourceUrl": "https://www.g2.com/products/capsule-crm/reviews",
+  "scrapedAt": "2026-04-19T10:30:00+00:00"
 }
 ```
 
-### Mode: Category Browse
+## Scheduling for continuous monitoring
 
-List all products in a G2 category:
+To catch new reviews as they come in, set up a schedule in Apify. Go to your actor's Schedules tab and configure it to run daily or weekly. Use a URL sorted by `order=most_recent` so you always get the newest reviews first. New records accumulate in the dataset over time and can feed a webhook, a spreadsheet sync, or any downstream pipeline.
 
-```
-{
-    "mode": "category_browse",
-    "categoryUrl": "project-management",
-    "maxProducts": 100
-}
-```
+## Other review platforms
 
-## Output Example — Review
+If you're building a cross-platform review monitoring pipeline, these actors cover complementary platforms:
 
-```
-{
-    "productSlug": "clickup",
-    "productName": "ClickUp",
-    "reviewId": "review-12675163",
-    "reviewUrl": "https://www.g2.com/survey_responses/clickup-review-12675163",
-    "rating": 5.0,
-    "title": "ClickUp's All-in-One Platform Boosts Organization and Productivity",
-    "reviewText": "What I like most about ClickUp is its all-in-one approach...",
-    "reviewDate": "2026-04-23",
-    "reviewerName": "Maria G.",
-    "reviewerCountry": "Bulgaria",
-    "reviewerRegion": "Europe",
-    "reviewerPrimaryRegion": "EMEA",
-    "reviewerSegment": "small-business",
-    "npsScore": 5,
-    "npsRaw": 10.0,
-    "easeOfUseRating": 2.5,
-    "qualityOfSupportRating": 3.0,
-    "easeOfSetupRating": null,
-    "meetsRequirementsRating": 3.5,
-    "easeOfAdminRating": null,
-    "easeOfDoingBusinessWithRating": null,
-    "directionRating": 3.5,
-    "sentimentThemes": null,
-    "loveTheme": null,
-    "hateTheme": null,
-    "switchedFromOtherProduct": "no",
-    "switchedFromProductIds": null,
-    "switchedReason": null,
-    "switchingThemes": null,
-    "likelihoodToRecommend": 10.0,
-    "isVerifiedUser": true,
-    "isIncentivizedReview": false,
-    "reviewSource": "organic",
-    "sourceType": "organic",
-    "companySegmentCode": 179,
-    "industry": 263,
-    "helpful": 0,
-    "responseType": "text",
-    "published": true,
-    "publishedAt": "2026-04-23T08:05:01.149-05:00",
-    "scrapedAt": "2026-04-23T14:37:23.301216+00:00"
-}
-```
+- [GetApp Scraper](https://apify.com/coder_luffy/getapp-com-scraper) covers many of the same software products as G2
+- [Capterra Reviews Scraper](https://apify.com/kawsar/capterra-reviews-scraper) pulls structured reviews from Capterra
+- [Capterra Scraper](https://apify.com/kawsar/capterra-scraper) covers broader Capterra product data
 
-## Output Example — Product
-
-```
-{
-    "productSlug": "clickup",
-    "productName": "ClickUp",
-    "productUrl": "https://www.g2.com/products/clickup",
-    "productWebsite": "clickup.com",
-    "averageRating": 4.66,
-    "starRating": 5,
-    "totalReviews": 11263,
-    "category": "Project and Portfolio Management",
-    "allCategories": ["Project Management", "Task Management", "Work Management"],
-    "description": "ClickUp is one app to replace them all...",
-    "vendorName": "ClickUp",
-    "uuid": "432a896c-e0d7-467f-a8e9-148f85044553",
-    "scrapedAt": "2026-04-09T15:00:00.000000+00:00"
-}
-```
-
-## FAQ
-
-**Does this need a proxy?**
-No. The data path used by this Actor is publicly accessible without authentication or IP restrictions.
-
-**Why do other G2 scrapers fail?**
-They scrape G2's frontend (`www.g2.com`) which uses Cloudflare + DataDome — one of the most aggressive anti-bot stacks. This actor avoids that frontend entirely.
-
-**Can I get reviewer email or full company name?**
-No. The API only exposes the reviewer's display name, country, region, and company segment code (small-business, mid-market, enterprise).
-
-**What's the max reviews per product?**
-50,000 per run. The actor uses cursor-based pagination, which has no offset limit.
-
-**How fresh is the data?**
-Reviews appear within hours of being published on G2. The data is live, not cached.
-
-**What if the data path stops working?**
-If G2 changes their backend configuration, the actor will log a clear error message and a fix will be shipped quickly. No fallback to browser scraping — the direct-data approach is the entire value proposition.
-
-**How do I scrape G2 reviews in Python?**
-Use the [Apify Python client](https://docs.apify.com/api/client/python). Install it with `pip install apify-client`, then call this Actor with your desired input. See the Python example above.
-
-**Is scraping G2 reviews legal?**
-This actor accesses G2's publicly available data — the same information visible to any anonymous visitor. No authentication is bypassed and no terms of service are circumvented. Always consult legal counsel for your specific use case.
-
-**How much does it cost to scrape G2 reviews?**
-$0.005 per review ($5 per 1,000 reviews). Scrape 100 reviews for just $0.50. You can start with Apify's free plan which includes $5 of monthly usage — enough for 1,000 reviews.
-
-**Can I use this as a G2 API?**
-Yes. This Actor functions as a G2 API alternative. Access it via the [Apify API](https://docs.apify.com/api) with RESTful endpoints, webhooks, and scheduled runs. Get structured JSON data from G2 without maintaining your own scraping infrastructure.
-
-**What's the difference between this and other G2 scrapers on Apify?**
-Most G2 scrapers use browser-based scraping against G2's frontend, which is protected by Cloudflare + DataDome. They have ~30-50% success rates and cost 2-3x more. This Actor uses a different approach that avoids the anti-bot stack entirely — no browser, no proxy, 99% success rate.
-
-## Integrations & data export
-
-Export your G2 review data in JSON, CSV, Excel, or XML. Integrate directly with:
-
-- **Google Sheets** — automatic data sync
-- **Zapier / Make / n8n** — workflow automation
-- **REST API** — programmatic access from Python, JavaScript, or any language
-- **Webhooks** — real-time notifications when scrapes complete
-
-[See all integrations →](https://docs.apify.com/platform/integrations)
-
-## Other review scrapers by Zhorex
-
-**B2B Review Intelligence:**
-
-- [Capterra Reviews Scraper](https://apify.com/zhorex/capterra-reviews-scraper) — Software reviews with sub-ratings and pros/cons
-- [Booking.com Reviews Scraper](https://apify.com/zhorex/booking-reviews-scraper) — Hotel reviews, scores, and sentiment analysis
-
-**Chinese Social Intelligence Suite:**
-
-- [RedNote Xiaohongshu Scraper](https://apify.com/zhorex/rednote-xiaohongshu-scraper) — China's #1 lifestyle platform (300M+ users)
-- [Weibo Scraper](https://apify.com/zhorex/weibo-scraper) — China's Twitter (580M+ users)
-- [Bilibili Scraper](https://apify.com/zhorex/bilibili-scraper) — China's YouTube (300M+ users)
-
-**Other Tools:**
-
-- [Perplexity AI Search Scraper](https://apify.com/zhorex/perplexity-ai-scraper) — AI search results and brand monitoring
-- [Telegram Channel Scraper](https://apify.com/zhorex/telegram-channel-scraper) — Telegram messages and media
-- [Domain Authority Checker](https://apify.com/zhorex/domain-authority-checker) — Bulk SEO domain analysis
-
-## Legal Disclaimer
-
-This actor accesses G2's publicly available data — the same information visible to any anonymous visitor on g2.com. No authentication is bypassed, no login credentials are used, and no terms of service are circumvented. This actor sends standard HTTP requests to public endpoints only.
-
----
-
-## Your Review Matters
-
-Other G2 scrapers on Apify average 1.4 stars because they fight Cloudflare + DataDome and lose. This one works because it uses a completely different approach.
-
-If this Actor delivered the reviews you needed, **a 30-second review helps others find it:**
-
-1. Go to the [G2 Reviews Scraper page](https://apify.com/zhorex/g2-reviews-scraper)
-2. Scroll down and click the star rating
-3. Optionally leave a one-line comment (e.g. "extracted 5,000 Slack reviews in 2 minutes")
-
-**Why it matters:** Reviews are the #1 signal users check before trying a scraper. With a high rating, more people find this Actor instead of broken alternatives. More users = more improvements = better tool for everyone.
-
-Found a bug instead? [Open an issue](https://apify.com/zhorex/g2-reviews-scraper/issues) and I'll fix it fast.
+![Review Monitoring](https://images.apifyusercontent.com/enTDROzMb13yKxR18m9buogKgiNS2yknNwE698le07c/w:1800/cb:1/aHR0cHM6Ly9pLmltZ3VyLmNvbS9MU1lGVE85LnBuZw.webp)
